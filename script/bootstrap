@@ -140,6 +140,15 @@ install_dotfiles () {
 setup_gitconfig
 install_dotfiles
 
+install_ohmyzsh () {
+  info 'installing oh-my-zsh'
+  [ -d ~/.oh-my-zsh ] || git clone https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+  [ -d ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting ] || git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+  [ -d ~/.oh-my-zsh/custom/plugins/zaw ] || git clone https://github.com/zsh-users/zaw.git ~/.oh-my-zsh/custom/plugins/zaw
+}
+
+install_ohmyzsh
+
 # If we're on a Mac, let's install and setup homebrew.
 if [ "$(uname -s)" == "Darwin" ]
 then
