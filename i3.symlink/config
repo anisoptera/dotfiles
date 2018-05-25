@@ -152,6 +152,9 @@ mode "resize" {
 bindsym $mod+r mode "resize"
 bindsym $mod+l exec --no-startup-id xscreensaver-command -lock
 
+# take a screenshot with my fav screenshot shortcut
+bindsym --release  $mod+Shift+Ctrl+4 exec --no-startup-id import /tmp/latest-screenshot.png
+
 # Extract the current container from its parent, and open it in a new container underneath
 bindsym $mod+Shift+x mark --add victim, \
 focus parent, focus parent, mark --add parent, split vertical, \
