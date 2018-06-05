@@ -135,6 +135,16 @@ install_dotfiles () {
     dst="$HOME/.$(basename "${src%.*}")"
     link_file "$src" "$dst"
   done
+
+	[ -d $HOME/.config ] || mkdir $HOME/.config
+  for src in $(find -H "$DOTFILES_ROOT" -maxdepth 2 -name '*.config-symlink' -not -path '*.git*')
+  do
+		src_dir="$(basename "${src%/*}")"
+		dst_dir=$HOME/.config/$src_dir
+		[ -d $dst_dir ] || mkdir $dst_dir
+    dst="$dst_dir/$(basename "${src%.*}")"
+    link_file "$src" "$dst"
+  done
 }
 
 setup_gitconfig
