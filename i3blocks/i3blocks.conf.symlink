@@ -81,6 +81,7 @@ separator=false
 [bandwidth]
 #instance=eth0
 interval=5
+command=~/.dotfiles/bin/bandwidth
 
 # CPU usage
 #
