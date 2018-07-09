@@ -172,6 +172,3 @@ bar {
 	tray_output primary
 	position top
 }
-
-# some startup commands
-exec --no-startup-id xscreensaver -no-splash
