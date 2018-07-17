@@ -157,7 +157,8 @@ bind 122 exec --no-startup-id "pactl set-sink-volume @DEFAULT_SINK@ -5% && pkill
 bind 123 exec --no-startup-id "pactl set-sink-volume @DEFAULT_SINK@ +5% && pkill -RTMIN+10 i3blocks"
 
 # take a screenshot with my fav screenshot shortcut
-bindsym --release $mod+Shift+Ctrl+4 exec --no-startup-id import png:- | xclip -selection clipboard -t image/png
+#bindsym --release $mod+Shift+Ctrl+4 exec --no-startup-id import png:- | xclip -selection clipboard -t image/png
+bindsym --release $mod+Shift+Ctrl+4 exec teiler
 
 # Extract the current container from its parent, and open it in a new container underneath
 bindsym $mod+Shift+x mark --add victim, \

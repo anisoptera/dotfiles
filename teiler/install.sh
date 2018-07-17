@@ -1,6 +1,6 @@
 #!/usr/bin/zsh
 
-sudo apt install maim ffmpeg xclip
+sudo apt install maim ffmpeg xclip xininfo copyq
 mkdir ~/scratch
 git clone https://github.com/carnager/teiler.git ~/scratch/teiler
 pushd ~/scratch/teiler
