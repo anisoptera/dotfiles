@@ -28,6 +28,11 @@ command=/usr/share/i3blocks/$BLOCK_NAME
 separator_block_width=15
 markup=none
 
+[pomodoro]
+label=🍅
+interval=30
+command=emacsclient -e '(isism/i3-pomodoro-status)'
+
 # Volume indicator
 #
 # The first parameter sets the step (and units to display)
