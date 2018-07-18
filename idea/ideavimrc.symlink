@@ -1,0 +1,3 @@
+set surround
+" Press `F` to activate Target Mode
+map F :action AceAction<CR>
