@@ -25,6 +25,7 @@ brew 'yarn'
 brew 'youtube-dl'
 
 cask '1password'
+cask 'emacs'
 cask 'firefox'
 cask 'font-fira-code'
 cask 'google-chrome'
