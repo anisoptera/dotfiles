@@ -2,6 +2,7 @@ cask_args appdir: '/Applications'
 
 tap 'homebrew/bundle'
 tap 'puma/puma'
+tap 'homebrew/cask-fonts'
 
 brew 'ack'
 brew 'coreutils'
@@ -25,6 +26,7 @@ brew 'youtube-dl'
 
 cask '1password'
 cask 'firefox'
+cask 'font-fira-code'
 cask 'google-chrome'
 cask 'handbrake'
 cask 'slack'
