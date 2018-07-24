@@ -1,3 +1,4 @@
 set surround
-" Press `F` to activate Target Mode
-map F :action AceAction<CR>
+let mapleader = " "
+" Press `SPC SPC` to activate Target Mode
+nnoremap <silent> <Leader><Space> :action AceAction<CR>
