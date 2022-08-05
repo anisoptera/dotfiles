@@ -13,3 +13,4 @@ done
 
 # load the last path file
 source $ZSH/system/_path.zsh
+source "$HOME/.cargo/env"
