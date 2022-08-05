@@ -2,7 +2,7 @@
 
 if [ "$(uname -s)" != "Darwin" ]
 then
-	sudo apt install maim ffmpeg xclip xininfo copyq
+	sudo apt install -y maim ffmpeg xclip xininfo copyq
 	mkdir ~/scratch
 	git clone https://github.com/carnager/teiler.git ~/scratch/teiler
 	pushd ~/scratch/teiler

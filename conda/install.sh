@@ -10,6 +10,6 @@ then
 	else
 		curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh > $tmpfile
 	fi
-	bash $tmpfile
+	bash $tmpfile -b -u
 fi
 conda config --set changeps1 False
