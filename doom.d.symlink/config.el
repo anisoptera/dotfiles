@@ -21,8 +21,13 @@
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
 ;;
-(setq doom-font (font-spec :family "Fira Code" :size 22 :weight 'semi-light)
-      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 24))
+(cond
+ (IS-MAC
+  (setq doom-font (font-spec :family "BerkeleyMono Nerd Font" :size 12)
+        doom-variable-pitch-font (font-spec :family "Fira Sans" :size 18)))
+ (t
+  (setq doom-font (font-spec :family "BerkeleyMono Nerd Font" :size 22)
+        doom-variable-pitch-font (font-spec :family "Fira Sans" :size 28))))
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
@@ -75,11 +80,14 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 ;;
-(use-package platformio-mode
+(use-package! platformio-mode
   :config (progn
             (add-hook 'c++-mode-hook (lambda ()
                                        (lsp-deferred)
                                        (platformio-conditionally-enable)))))
+
+(use-package! mixed-pitch
+  :hook (org-mode . mixed-pitch-mode))
 
 (progn
   (map! :map org-mode-map :localleader :n "c p" #'org-pomodoro)
@@ -138,3 +146,58 @@
 
       (term-send-string (get-process "/dev/ttyACM0")
                         (concat (buffer-string) "\n")))))
+
+;; for some reason, `C-t` opens a new workspace. I don't like that.
+(unbind-key "C-t" 'evil-normal-state-map)
+
+;; not actually as big a fan of the doom logo as you might expect
+(defun boring-banner ()
+  (let* ((banner '("boring emacs online"
+                   ;; "foo etc ..."
+                   ))
+         (longest-line (apply #'max (mapcar #'length banner))))
+    (put-text-property
+     (point)
+     (dolist (line banner (point))
+       (insert (+doom-dashboard--center
+                +doom-dashboard--width
+                (concat line (make-string (max 0 (- longest-line (length line))) 32)))
+               "\n"))
+     'face 'doom-dashboard-banner)))
+
+(setq +doom-dashboard-ascii-banner-fn #'boring-banner)
+
+;; send a specific term type for tramp
+(after! tramp
+  (setq tramp-terminal-type "tramp"))
+
+;; Make a minor mode for embiggening org headlines
+(defvar ia/bigger-org-headlines-cookies nil)
+(make-variable-buffer-local 'ia/bigger-org-headlines-cookies)
+
+(define-minor-mode ia/bigger-org-headlines
+  "Increases the size of Org headlines (inverse) proportionally to their depth."
+  :lighter " Big-Org-Headlines"
+  (if ia/bigger-org-headlines
+      (let ((scale-step (/ (1- text-scale-mode-step) 1)))
+        (seq-map-indexed
+         (lambda (face idx)
+           (push (face-remap-add-relative face
+                                          :height (1+ (* scale-step idx))
+                                          :weight 'bold)
+                 ia/bigger-org-headlines-cookies))
+         ;; reverse this so that smallest is first
+         ;; also drop the first 4 faces so that this doesnt get out of control
+         (seq-drop (reverse org-level-faces) 4)))
+    (mapc #'face-remap-remove-relative ia/bigger-org-headlines-cookies))
+  (force-window-update (current-buffer)))
+
+(add-hook! 'org-mode-hook #'ia/bigger-org-headlines)
+
+(defun ia/notepad-frame ()
+  (interactive)
+  ;; can't do this one on windows lol
+  (set-frame-position nil 0 0)
+  ;; TODO make this pixelwise
+  (set-frame-size nil 163 60))
+
