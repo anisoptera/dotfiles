@@ -183,7 +183,7 @@
         (seq-map-indexed
          (lambda (face idx)
            (push (face-remap-add-relative face
-                                          :height (1+ (* scale-step idx))
+                                          :height (1+ (* scale-step (1+ idx)))
                                           :weight 'bold)
                  ia/bigger-org-headlines-cookies))
          ;; reverse this so that smallest is first
