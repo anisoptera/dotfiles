@@ -86,8 +86,18 @@
                                        (lsp-deferred)
                                        (platformio-conditionally-enable)))))
 
+(use-package! mozc)
+(use-package! fcitx
+  :config (progn
+            (setq fcitx-remote-command "fcitx5-remote")
+            (setq fcitx-use-dbus nil)
+            (fcitx-aggressive-setup)))
+
 (use-package! mixed-pitch
   :hook (org-mode . mixed-pitch-mode))
+
+(after! vterm
+  (setq vterm-shell "/usr/bin/zsh"))
 
 (progn
   (map! :map org-mode-map :localleader :n "c p" #'org-pomodoro)
