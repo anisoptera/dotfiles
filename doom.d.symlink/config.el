@@ -86,12 +86,12 @@
                                        (lsp-deferred)
                                        (platformio-conditionally-enable)))))
 
-(use-package! mozc)
-(use-package! fcitx
-  :config (progn
-            (setq fcitx-remote-command "fcitx5-remote")
-            (setq fcitx-use-dbus nil)
-            (fcitx-aggressive-setup)))
+(when IS-LINUX
+  (use-package! fcitx
+    :config (progn
+              (setq fcitx-remote-command "fcitx5-remote")
+              (setq fcitx-use-dbus nil)
+              (fcitx-aggressive-setup))))
 
 (use-package! mixed-pitch
   :hook (org-mode . mixed-pitch-mode))
@@ -221,11 +221,6 @@
      resume: ")))")
    str arg))
 
-<<<<<<< variant A
 (use-package! ranger)
->>>>>>> variant B
-
-(use-package w3m)
 
 (server-start)
-======= end

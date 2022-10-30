@@ -9,7 +9,6 @@
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 (package! platformio-mode)
 (package! mixed-pitch)
-(package! mozc)
 (package! fcitx)
 (package! ranger)
 
