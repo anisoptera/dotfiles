@@ -174,8 +174,9 @@
                 (concat line (make-string (max 0 (- longest-line (length line))) 32)))
                "\n"))
      'face 'doom-dashboard-banner)))
+;; (setq +doom-dashboard-ascii-banner-fn #'boring-banner)
 
-(setq +doom-dashboard-ascii-banner-fn #'boring-banner)
+(setq fancy-splash-image "~/.doom.d/M-x_butterfly.png")
 
 ;; send a specific term type for tramp
 (after! tramp
@@ -211,3 +212,5 @@
   ;; TODO make this pixelwise
   (set-frame-size nil 163 60))
 
+
+(use-package! ranger)
