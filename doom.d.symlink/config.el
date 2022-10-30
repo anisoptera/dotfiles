@@ -24,7 +24,7 @@
 (cond
  (IS-MAC
   (setq doom-font (font-spec :family "BerkeleyMono Nerd Font" :size 12)
-        doom-variable-pitch-font (font-spec :family "Fira Sans" :size 18)))
+        doom-variable-pitch-font (font-spec :family "Avenir" :size 18)))
  (t
   (setq doom-font (font-spec :family "BerkeleyMono Nerd Font" :size 22)
         doom-variable-pitch-font (font-spec :family "Fira Sans" :size 28))))
@@ -212,5 +212,20 @@
   ;; TODO make this pixelwise
   (set-frame-size nil 163 60))
 
+;; Fix skeleton to allow some sort of escape
+(defadvice! fixed-projectile-skel-dir-locals (&optional str arg)
+  :override #'projectile-skel-dir-locals
+  (interactive "*P\nP")
+  (skeleton-proxy-new
+   '(nil "((nil . (" ("" '(projectile-skel-variable-cons) n)
+     resume: ")))")
+   str arg))
 
+<<<<<<< variant A
 (use-package! ranger)
+>>>>>>> variant B
+
+(use-package w3m)
+
+(server-start)
+======= end

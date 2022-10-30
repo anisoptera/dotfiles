@@ -1,1 +1,1 @@
-eval "$(starship init zsh)"
+[[ $TERM == "dumb" ]] || eval "$(starship init zsh)"
