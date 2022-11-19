@@ -19,6 +19,9 @@ zstyle ':z4h:bindkey' keyboard  'pc'
 # Mark up shell's output with semantic information.
 zstyle ':z4h:' term-shell-integration 'yes'
 
+# Disable integrated tmux if we're on tty1 (so we can startx)
+[[ $(tty) == "/dev/tty1" ]] && exec startx
+
 # Right-arrow key accepts one character ('partial-accept') from
 # command autosuggestions or the whole thing ('accept')?
 zstyle ':z4h:autosuggestions' forward-char 'accept'
@@ -143,6 +146,8 @@ do
 done
 
 unset config_files
+
+[[ -r "/usr/share/z/z.sh" ]] && source /usr/share/z/z.sh
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 

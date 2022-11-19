@@ -180,7 +180,8 @@
 
 ;; send a specific term type for tramp
 (after! tramp
-  (setq tramp-terminal-type "tramp"))
+  (setq tramp-terminal-type "tramp")
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
 ;; Make a minor mode for embiggening org headlines
 (defvar ia/bigger-org-headlines-cookies nil)
@@ -221,6 +222,35 @@
      resume: ")))")
    str arg))
 
-(use-package! ranger)
+(after! elfeed
+  (defun elfeed-eww-open (&optional use-generic-p)
+    "open with eww"
+    (interactive "P")
+    (let ((entries (elfeed-search-selected)))
+      (cl-loop for entry in entries
+               do (elfeed-untag entry 'unread)
+               when (elfeed-entry-link entry)
+               do (eww-browse-url it))
+      (mapc #'elfeed-search-update-entry entries)
+      (unless (use-region-p) (forward-line))))
+  (map! :map elfeed-search-mode-map :localleader :n "w" #'elfeed-eww-open))
 
-(server-start)
+;; Actually focus new frames
+(defun ia/focus-new-client-frame ()
+  (select-frame-set-input-focus (selected-frame)))
+
+(add-hook 'server-after-make-frame-hook #'ia/focus-new-client-frame)
+
+;; easier eval in clojure mode
+(map! :after cider-mode :map clojure-mode-map :n "," #'cider-eval-last-sexp)
+
+(load (string-join `(,doom-user-dir "org-monster.el")))
+
+(defun ediff-copy-both-to-C ()
+  (interactive)
+  (ediff-copy-diff ediff-current-difference nil 'C nil
+                   (concat
+                    (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
+                    (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
+(defun add-d-to-ediff-mode-map () (define-key ediff-mode-map "d" 'ediff-copy-both-to-C))
+(add-hook 'ediff-keymap-setup-hook 'add-d-to-ediff-mode-map)
