@@ -160,24 +160,6 @@
 ;; for some reason, `C-t` opens a new workspace. I don't like that.
 (unbind-key "C-t" 'evil-normal-state-map)
 
-;; not actually as big a fan of the doom logo as you might expect
-(defun boring-banner ()
-  (let* ((banner '("boring emacs online"
-                   ;; "foo etc ..."
-                   ))
-         (longest-line (apply #'max (mapcar #'length banner))))
-    (put-text-property
-     (point)
-     (dolist (line banner (point))
-       (insert (+doom-dashboard--center
-                +doom-dashboard--width
-                (concat line (make-string (max 0 (- longest-line (length line))) 32)))
-               "\n"))
-     'face 'doom-dashboard-banner)))
-;; (setq +doom-dashboard-ascii-banner-fn #'boring-banner)
-
-(setq fancy-splash-image "~/.doom.d/M-x_butterfly.png")
-
 ;; send a specific term type for tramp
 (after! tramp
   (setq tramp-terminal-type "tramp")
@@ -254,3 +236,99 @@
                     (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
 (defun add-d-to-ediff-mode-map () (define-key ediff-mode-map "d" 'ediff-copy-both-to-C))
 (add-hook 'ediff-keymap-setup-hook 'add-d-to-ediff-mode-map)
+
+;; Fun with dashboard phrases
+;; https://git.tecosaur.net/tec/emacs-config/src/branch/master/config.org#headline-55
+
+(defvar splash-phrase-source-folder
+  (expand-file-name "misc/splash-phrases" doom-user-dir)
+  "A folder of text files with a fun phrase on each line.")
+
+;; It would be good to specify/detect which of the two cases apply based on the file name alone. I've done this by setting the simple check that if the file name contains -N- (where N is some number) then it is taken as the N=​th phrase component, with everything preceding the =-N- token taken as the collection identifier, and everything after -N- ignored.
+(defvar splash-phrase-sources
+  (let* ((files (directory-files splash-phrase-source-folder nil "\\.txt\\'"))
+         (sets (delete-dups (mapcar
+                             (lambda (file)
+                               (replace-regexp-in-string "\\(?:-[0-9]+-\\w+\\)?\\.txt" "" file))
+                             files))))
+    (mapcar (lambda (sset)
+              (cons sset
+                    (delq nil (mapcar
+                               (lambda (file)
+                                 (when (string-match-p (regexp-quote sset) file)
+                                   file))
+                               files))))
+            sets))
+  "A list of cons giving the phrase set name, and a list of files which contain phrase components.")
+
+(defvar splash-phrase-set
+  (nth (random (length splash-phrase-sources)) (mapcar #'car splash-phrase-sources))
+  "The default phrase set. See `splash-phrase-sources'.")
+
+(defun splash-phrase-set-random-set ()
+  "Set a new random splash phrase set."
+  (interactive)
+  (setq splash-phrase-set
+        (nth (random (1- (length splash-phrase-sources)))
+             (cl-set-difference (mapcar #'car splash-phrase-sources) (list splash-phrase-set))))
+  (+doom-dashboard-reload t))
+
+(defun splash-phrase-select-set ()
+  "Select a specific splash phrase set."
+  (interactive)
+  (setq splash-phrase-set (completing-read "Phrase set: " (mapcar #'car splash-phrase-sources)))
+  (+doom-dashboard-reload t))
+
+(defvar splash-phrase--cached-lines nil)
+
+(defun splash-phrase-get-from-file (file)
+  "Fetch a random line from FILE."
+  (let ((lines (or (cdr (assoc file splash-phrase--cached-lines))
+                   (cdar (push (cons file
+                                     (with-temp-buffer
+                                       (insert-file-contents (expand-file-name file splash-phrase-source-folder))
+                                       (split-string (string-trim (buffer-string)) "\n")))
+                               splash-phrase--cached-lines)))))
+    (nth (random (length lines)) lines)))
+
+(defun splash-phrase (&optional set)
+  "Construct a splash phrase from SET. See `splash-phrase-sources'."
+  (mapconcat
+   #'splash-phrase-get-from-file
+   (cdr (assoc (or set splash-phrase-set) splash-phrase-sources))
+   " "))
+
+(defun splash-phrase-dashboard-formatted ()
+  "Get a splash phrase, flow it over multiple lines as needed, and fontify it."
+  (mapconcat
+   (lambda (line)
+     (+doom-dashboard--center
+      +doom-dashboard--width
+      (with-temp-buffer
+        (insert-text-button
+         line
+         'action
+         (lambda (_) (+doom-dashboard-reload t))
+         'face 'doom-dashboard-menu-title
+         'mouse-face 'doom-dashboard-menu-title
+         'help-echo "Random phrase"
+         'follow-link t)
+        (buffer-string))))
+   (split-string
+    (with-temp-buffer
+      (insert (splash-phrase))
+      (setq fill-column (min 70 (/ (* 2 (window-width)) 3)))
+      (fill-region (point-min) (point-max))
+      (buffer-string))
+    "\n")
+   "\n"))
+
+(defun splash-phrase-dashboard-insert ()
+  "Insert the splash phrase surrounded by newlines."
+  (insert "\n" (splash-phrase-dashboard-formatted) "\n"))
+
+(setq fancy-splash-image "~/.doom.d/M-x_butterfly.png")
+
+(setq +doom-dashboard-functions
+      (list #'doom-dashboard-widget-banner
+            #'splash-phrase-dashboard-insert))
