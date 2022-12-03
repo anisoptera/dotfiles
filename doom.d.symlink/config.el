@@ -37,15 +37,16 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-tokyo-night)
+(setq doom-theme 'doom-challenger-deep)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
+(setq display-line-numbers-type :relative)
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
+(setq org-agenda-files "~/org/.agenda")
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
@@ -226,7 +227,11 @@
 ;; easier eval in clojure mode
 (map! :after cider-mode :map clojure-mode-map :n "," #'cider-eval-last-sexp)
 
-(load (string-join `(,doom-user-dir "org-monster.el")))
+;; Org configuration has its own separate files because it's ... extra
+(add-to-list 'org-modules 'org-habit)
+(after! org
+  (load! "org-flow.el")
+  (load! "org-monster.el"))
 
 (defun ediff-copy-both-to-C ()
   (interactive)
@@ -332,3 +337,5 @@
 (setq +doom-dashboard-functions
       (list #'doom-dashboard-widget-banner
             #'splash-phrase-dashboard-insert))
+
+(global-auto-revert-mode t)

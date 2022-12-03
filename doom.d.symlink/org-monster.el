@@ -16,7 +16,7 @@
   (if (org-clocking-buffer)
       (message "Clocked in on “%s”" org-clock-heading)
     (with-selected-frame (raise-or-make-monster-frame)
-      (org-agenda-list))))
+      (org-agenda nil " "))))
 
 (run-with-idle-timer 300 t #'ia/org-idle-hook)
 
