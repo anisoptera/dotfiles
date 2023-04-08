@@ -339,3 +339,44 @@
             #'splash-phrase-dashboard-insert))
 
 (global-auto-revert-mode t)
+
+(defun cider-jack-in-babashka ()
+  "Start an babashka nREPL server for the current project and connect to it."
+  (interactive)
+  (let* ((default-directory (project-root (project-current t)))
+         (process-filter (lambda (proc string)
+                           "Run cider-connect once babashka nrepl server is ready."
+                           (when (string-match "Started nREPL server at .+:\\([0-9]+\\)" string)
+                             (cider-connect-clj (list :host "localhost"
+                                                      :port (match-string 1 string)
+                                                      :project-dir default-directory)))
+                           ;; Default behavior: write to process buffer
+                           (internal-default-process-filter proc string))))
+    (set-process-filter
+       (start-file-process "babashka" "*babashka*" "bb" "--nrepl-server" "0")
+       process-filter)))
+
+;; Fix avy-migemo, since it hasn't been updated since 2018 and avy moved on
+(use-package el-patch)
+(el-patch-feature avy-migemo)
+(with-eval-after-load 'avy-migemo
+  (el-patch-defun avy-migemo-goto-char-2 (char1 char2 &optional arg beg end)
+  "The same as `avy-goto-char-2' except for the candidates via migemo."
+  (interactive (list (read-char "char 1: " t)
+                     (read-char "char 2: " t)
+                     current-prefix-arg
+                     nil nil))
+  (when (eq char1 ?)
+    (setq char1 ?\n))
+  (when (eq char2 ?)
+    (setq char2 ?\n))
+  (avy-with avy-goto-char-2
+    ((el-patch-swap avy--generic-jump avy-jump)
+     ;; Adapt for migemo
+     (if (eq char1 ?\n)
+         (concat (string char1) (avy-migemo-regex-quote-concat (string char2)))
+       (avy-migemo-regex-quote-concat (string char1 char2)))
+     (el-patch-add :window-flip) arg
+     (el-patch-remove avy-style)
+     (el-patch-add :beg) beg
+     (el-patch-add :end) end))))
