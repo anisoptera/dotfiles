@@ -1,3 +1,16 @@
+(setq org-clock-idle-time 15)
+
+;; Kind of like onenote, just write to the original file.
+;; First we have to enable auto-save-visited-mode ...
+(auto-save-visited-mode +1)
+
+;; and then turn it off globally ...
+(setq auto-save-visited-mode nil)
+
+;; and then turn it on for org-mode ...
+(add-hook! 'org-mode-hook
+  (set (make-local-variable 'auto-save-visited-mode) t))
+
 (defun bh/is-project-p ()
   "Any task with a todo keyword subtask"
   (save-restriction
@@ -279,11 +292,58 @@ Skip project and sub-project tasks, habits, and loose non-project tasks."
               ("MEETING" . org-done)
               ("PHONE" org-done))))
 
+(setq org-agenda-prefix-format
+      '((agenda . " %i %-12(vulpea-agenda-category)%?-12t% s")
+        (todo . " %i %-12(vulpea-agenda-category) ")
+        (tags . " %i %-12(vulpea-agenda-category) ")
+        (search . " %i %-12(vulpea-agenda-category) ")))
+
+(defun vulpea-buffer-prop-get (name)
+  "Get a buffer property called NAME as a string."
+  (when (equal major-mode 'org-mode) ;; sometimes we call this from the agenda
+    (org-with-point-at 1
+      (when (re-search-forward (concat "^#\\+" name ": \\(.*\\)")
+                               (point-max) t)
+        (buffer-substring-no-properties
+         (match-beginning 1)
+         (match-end 1))))))
+
+(defun vulpea-agenda-category ()
+  "Get category of item at point for agenda.
+
+Category is defined by one of the following items:
+
+- CATEGORY property
+- TITLE keyword
+- TITLE property
+- filename without directory and extension
+
+Usage example:
+
+  (setq org-agenda-prefix-format
+        '((agenda . \" %(vulpea-agenda-category) %?-12t %12s\")))
+
+Refer to `org-agenda-prefix-format' for more information."
+  (let* ((file-name (when buffer-file-name
+                      (file-name-sans-extension
+                       (file-name-nondirectory buffer-file-name))))
+         (title (vulpea-buffer-prop-get "title"))
+         (category (org-get-category)))
+    (or (if (and
+             title
+             (string-equal category file-name))
+            title
+          category)
+        "")))
+
 ;; Do not dim blocked tasks
 (setq org-agenda-dim-blocked-tasks nil)
 
 ;; Compact the block agenda view
 (setq org-agenda-compact-blocks t)
+
+;; Disable default stuck projects view
+(setq org-stuck-projects (quote ("" nil nil "")))
 
 ;; Custom agenda command definitions
 (setq org-agenda-custom-commands
@@ -354,16 +414,17 @@ Skip project and sub-project tasks, habits, and loose non-project tasks."
                             (org-tags-match-list-sublevels nil)
                             (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
                             (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)))
-                (tags "-REFILE/"
-                      ((org-agenda-overriding-header "Tasks to Archive")
-                       (org-agenda-skip-function 'bh/skip-non-archivable-tasks)
-                       (org-tags-match-list-sublevels nil))))
+;                (tags "-REFILE/"
+;                      ((org-agenda-overriding-header "Tasks to Archive")
+;                       (org-agenda-skip-function 'bh/skip-non-archivable-tasks)
+;                       (org-tags-match-list-sublevels nil)))
+)
                nil))))
 
 (setq org-agenda-span 'day
       org-agenda-start-day nil)
 
-(setq org-default-notes-file  "~/org/refile.org")
+(setq org-default-notes-file "~/org/refile.org")
 
 ;; Capture templates for: TODO tasks, Notes, appointments, phone calls, meetings, and org-protocol
 (setq org-capture-templates
@@ -407,3 +468,7 @@ A prefix arg forces clock in of the default task."
     (widen)
     (org-with-point-at clock-in-to-task
       (org-clock-in nil))))
+
+(setq org-pomodoro-finished-sound-args "-v 4")
+(setq org-pomodoro-short-break-sound-args "-v 4")
+(setq org-pomodoro-long-break-sound-args "-v 4")

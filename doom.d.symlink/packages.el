@@ -11,6 +11,7 @@
 (package! mixed-pitch)
 (package! fcitx)
 (package! el-patch)
+(package! gptel)
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
@@ -25,7 +26,7 @@
                                         ;  :recipe (:host github :repo "username/repo"
                                         ;           :files ("some-file.el" "src/lisp/*.el")))
 (package! copilot
-  :recipe (:host github :repo "zerolfx/copilot.el"
+  :recipe (:host github :repo "copilot-emacs/copilot.el"
            :files ("*.el" "dist")))
 
 ;; If you'd like to disable a package included with Doom, you can do so here
