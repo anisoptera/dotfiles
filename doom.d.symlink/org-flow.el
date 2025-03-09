@@ -292,11 +292,11 @@ Skip project and sub-project tasks, habits, and loose non-project tasks."
               ("MEETING" . org-done)
               ("PHONE" org-done))))
 
-(setq org-agenda-prefix-format
-      '((agenda . " %i %-12(vulpea-agenda-category)%?-12t% s")
-        (todo . " %i %-12(vulpea-agenda-category) ")
-        (tags . " %i %-12(vulpea-agenda-category) ")
-        (search . " %i %-12(vulpea-agenda-category) ")))
+;; (setq org-agenda-prefix-format
+;;       '((agenda . " %i %-12(vulpea-agenda-category)%?-12t% s")
+;;         (todo . " %i %-12(vulpea-agenda-category) ")
+;;         (tags . " %i %-12(vulpea-agenda-category) ")
+;;         (search . " %i %-12(vulpea-agenda-category) ")))
 
 (defun vulpea-buffer-prop-get (name)
   "Get a buffer property called NAME as a string."
@@ -469,6 +469,12 @@ A prefix arg forces clock in of the default task."
     (org-with-point-at clock-in-to-task
       (org-clock-in nil))))
 
-(setq org-pomodoro-finished-sound-args "-v 4")
-(setq org-pomodoro-short-break-sound-args "-v 4")
-(setq org-pomodoro-long-break-sound-args "-v 4")
+(setq org-pomodoro-start-sound-args "-v 2")
+(setq org-pomodoro-finished-sound-args "-v 2")
+(setq org-pomodoro-short-break-sound-args "-v 2")
+(setq org-pomodoro-long-break-sound-args "-v 2")
+
+(setq org-pomodoro-start-sound "~/.doom.d/misc/Off.aif")
+(setq org-pomodoro-finished-sound "~/.doom.d/misc/Off.aif")
+(setq org-pomodoro-short-break-sound "~/.doom.d/misc/On.aif")
+(setq org-pomodoro-long-break-sound "~/.doom.d/misc/On.aif")

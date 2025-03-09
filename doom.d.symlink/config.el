@@ -389,3 +389,27 @@
               ("TAB" . 'copilot-accept-completion)
               ("C-TAB" . 'copilot-accept-completion-by-word)
               ("C-<tab>" . 'copilot-accept-completion-by-word)))
+
+;; don't complete with a dictionary in org-mode, thanks
+(after! org
+  (set-company-backend! 'org-mode nil))
+
+(use-package! gptel
+  :config (progn
+            (setq
+             gptel-default-mode 'org-mode
+             gptel-expert-commands t
+             gptel-model "quintessence"
+             gptel-backend (gptel-make-openai "quintessence"
+                             :stream t
+                             :protocol "http"
+                             :host "megami.citadel.lotuswind.net:8080"
+                             :models '("quintessence")))
+
+            (defun ia/gptel--request-data-add-stop-sequence-advice (orig-fun &rest args)
+              (let ((request-data (apply orig-fun args)))
+                ;; add the stop sequence to the result
+                (plist-put request-data :stop "<|eot_id|>")
+                request-data))
+
+            (advice-add 'gptel--request-data :around #'ia/gptel--request-data-add-stop-sequence-advice)))

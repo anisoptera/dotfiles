@@ -19,7 +19,7 @@ brew 'imagemagick'
 brew 'iproute2mac'
 brew 'libgccjit'
 brew 'markdown'
-brew "emacs-plus@29", args: ["with-native-comp", "with-xwidgets", "with-imagemagick"]
+brew "emacs-plus@30", args: ["with-xwidgets", "with-imagemagick"]
 brew 'jp2a'
 brew 'jq'
 brew 'libgit2'
