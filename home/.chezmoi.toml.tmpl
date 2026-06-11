@@ -1,5 +1,6 @@
 {{- $name := promptStringOnce . "name" "Git author name" -}}
 {{- $email := promptStringOnce . "email" "Git author email" -}}
+{{- $work := promptBoolOnce . "work" "Is this a work machine" -}}
 
 {{/* If the repo is checked out at ~/.dotfiles (rather than chezmoi's default
      source location), keep pointing at it across config regenerations. */}}
@@ -10,3 +11,4 @@ sourceDir = {{ joinPath .chezmoi.homeDir ".dotfiles" | quote }}
 [data]
     name = {{ $name | quote }}
     email = {{ $email | quote }}
+    work = {{ $work }}

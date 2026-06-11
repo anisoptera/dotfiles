@@ -35,7 +35,9 @@ brew 'rg'
 brew 'fd'
 brew 'mas'
 brew 'pueue'
+{{ if not .work -}}
 brew 'platformio'
+{{ end -}}
 brew 'pngpaste'
 brew 'postgresql@14'
 brew 'puma/puma/puma-dev'
@@ -53,20 +55,26 @@ cask '1password'
 cask 'alfred'
 cask 'bettertouchtool'
 cask 'discord'
+{{ if not .work -}}
 cask 'microsoft-edge'
 cask 'firefox'
+{{ end -}}
 cask 'font-fira-code'
 cask 'freecad'
 cask 'google-chrome'
+{{ if not .work -}}
 cask 'handbrake'
+{{ end -}}
 cask 'iterm2'
 cask 'krita'
 cask 'miniconda'
 cask 'nextcloud'
+{{ if not .work -}}
 cask 'slack'
 cask 'steam'
 cask 'telegram'
 cask 'transmission'
 cask 'vlc'
+{{ end -}}
 
 mas "WireGuard", id: 1451685025
