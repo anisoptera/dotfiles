@@ -1,0 +1,6 @@
+#!/bin/sh
+# Runs `brew bundle` whenever ~/.Brewfile changes.
+# Brewfile hash: {{ include "dot_Brewfile" | sha256sum }}
+set -e
+command -v brew >/dev/null 2>&1 || exit 0
+brew bundle --global --no-upgrade

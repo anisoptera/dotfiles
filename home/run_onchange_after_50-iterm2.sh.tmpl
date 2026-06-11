@@ -1,0 +1,10 @@
+{{ if eq .chezmoi.os "darwin" -}}
+#!/bin/sh
+# iTerm2: load settings from the chezmoi-managed folder. Written via
+# defaults(1) because macOS prefs go through cfprefsd; writing the plist
+# under ~/Library/Preferences directly gets ignored or clobbered. A
+# running iTerm2 may overwrite these on quit; tick "Load settings from a
+# custom folder" in its UI in that case.
+defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$HOME/.config/iterm2"
+defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
+{{ end -}}

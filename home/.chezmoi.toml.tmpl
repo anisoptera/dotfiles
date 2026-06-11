@@ -1,0 +1,12 @@
+{{- $name := promptStringOnce . "name" "Git author name" -}}
+{{- $email := promptStringOnce . "email" "Git author email" -}}
+
+{{/* If the repo is checked out at ~/.dotfiles (rather than chezmoi's default
+     source location), keep pointing at it across config regenerations. */}}
+{{- if stat (joinPath .chezmoi.homeDir ".dotfiles/.chezmoiroot") }}
+sourceDir = {{ joinPath .chezmoi.homeDir ".dotfiles" | quote }}
+{{- end }}
+
+[data]
+    name = {{ $name | quote }}
+    email = {{ $email | quote }}

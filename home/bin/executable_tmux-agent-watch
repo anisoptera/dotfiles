@@ -1,0 +1,75 @@
+#!/bin/sh
+# Three-state "unread" tracking for windows running agent CLIs (claude,
+# codex, ...). Invoked from status-right, so it runs once per
+# status-interval and must print nothing.
+#
+# For each window whose active pane runs one of @agent_watch_cmds (an ERE),
+# maintains the window option @agent_state:
+#   active  output since the window was last viewed
+#   done    idle >= @agent_idle_seconds after such output (one bell)
+#   (unset) viewed since the last output
+# tmux's own activity flag carries the "seen" semantics: it sets on output
+# in a non-current window and clears only when the window is visited, so
+# revisiting without new output can never re-trigger a ping.
+
+# The caller passes #{socket_path} so we always talk to the right server,
+# even when the job environment lacks $TMUX.
+sock=$1
+t() {
+    if [ -n "$sock" ]; then
+        tmux -S "$sock" "$@"
+    else
+        tmux "$@"
+    fi
+}
+
+cmds=$(t show -gqv @agent_watch_cmds)
+[ -n "$cmds" ] || exit 0
+idle=$(t show -gqv @agent_idle_seconds)
+fresh=$(t show -gqv @agent_fresh_seconds)
+grace=$(t show -gqv @agent_grace_seconds)
+bell=$(t show -gqv @agent_bell)
+: "${idle:=60}" "${fresh:=60}" "${grace:=2}" "${bell:=on}"
+now=$(date +%s)
+
+t list-windows -a -F '#{window_id} #{session_attached} #{window_activity_flag} #{window_activity} #{monitor-activity} #{?@agent_state,#{@agent_state},-} #{?@agent_seen,#{@agent_seen},0} #{pane_current_command}' |
+while read -r wid attached flag activity mon prev seen cmd; do
+    # Sessions with no client are headless automation: nobody is there to
+    # have "not seen" their output, and unattached sessions flag activity
+    # even on their current window, so they'd bell forever.
+    if [ "$attached" -ge 1 ] && printf '%s' "$cmd" | grep -Eq "^($cmds)\$"; then
+        [ "$mon" = 1 ] || t set -w -t "$wid" monitor-activity on
+        # Activity at/just after the moment we left the window is the
+        # focus-out redraw blip, not the agent doing something.
+        if [ "$flag" = 1 ] && [ "$activity" -gt $((seen + grace)) ]; then
+            age=$((now - activity))
+            if [ "$age" -ge $((idle + fresh)) ]; then
+                new=stale
+            elif [ "$age" -ge "$idle" ]; then
+                new=done
+            else
+                new=active
+            fi
+        else
+            new=-
+        fi
+    else
+        new=-
+    fi
+
+    [ "$new" = "$prev" ] && continue
+    mkdir -p "$HOME/.cache"
+    echo "$(date '+%F %T') $wid $cmd $prev -> $new" >> "$HOME/.cache/tmux-agent-watch.log"
+    if [ "$new" = - ]; then
+        t set -wu -t "$wid" @agent_state
+    else
+        t set -w -t "$wid" @agent_state "$new"
+        if [ "$new" = done ] && [ "$bell" = on ]; then
+            # Ring only the most recently used client; with several
+            # attached, one event should mean one beep.
+            tty=$(t list-clients -F '#{client_activity} #{client_tty}' |
+                sort -rn | head -1 | cut -d' ' -f2)
+            [ -n "$tty" ] && printf '\a' > "$tty" 2>/dev/null
+        fi
+    fi
+done

@@ -1,0 +1,37 @@
+[user]
+	name = {{ .name }}
+	email = {{ .email }}
+[alias]
+	co = checkout
+	promote = !~/bin/git-promote
+	wtf = !~/bin/git-wtf
+	rank-contributors = !~/bin/git-rank-contributors
+	count = !git shortlog -sn
+[color]
+	ui = true
+[core]
+	excludesfile = ~/.gitignore
+	editor = vim
+[apply]
+	whitespace = nowarn
+[mergetool]
+	keepBackup = false
+[difftool]
+	prompt = false
+[help]
+	autocorrect = 1
+[push]
+	default = simple
+[credential]
+{{- if eq .chezmoi.os "darwin" }}
+	helper = osxkeychain
+{{- else }}
+	helper = cache
+{{- end }}
+[protocol "file"]
+	allow = always
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

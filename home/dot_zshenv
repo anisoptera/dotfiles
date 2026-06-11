@@ -1,0 +1,2 @@
+# Minimal environment for the zsh fallback shell; fish is the daily driver.
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
